@@ -1,875 +1,276 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
 
-* {
-  box-sizing: border-box;
-}
-
-:root {
-  font-family: 'DM Sans', sans-serif;
-  color: #fffaf5;
-  background: #091426;
-  font-synthesis: none;
-  -webkit-font-smoothing: antialiased;
-}
-
-html {
-  min-width: 320px;
-  scroll-behavior: smooth;
-}
-
-body {
-  margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-button,
-input {
-  font: inherit;
-}
-
-button {
-  cursor: pointer;
-}
-
-.app {
+.road-page {
   position: relative;
-  isolation: isolate;
   min-height: 100vh;
+  width: 100vw;
+  box-sizing: border-box;
+  padding: 20px 40px;
   overflow: hidden;
-  padding: 0 5%;
-  background: linear-gradient(180deg, #091426, #1c3049 55%, #080e19);
+  font-family: sans-serif;
+  color: #e6cbab;
+  background-image: url('/images/indian-truck.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
-.scene {
+.background-shade {
   position: absolute;
   inset: 0;
-  z-index: -1;
-  overflow: hidden;
+  background: rgba(0, 0, 0, 0.25);
+  z-index: 0;
   pointer-events: none;
 }
 
-.moon {
-  position: absolute;
-  top: 100px;
-  right: 17%;
-  width: 75px;
-  height: 75px;
-  border-radius: 50%;
-  background: #f4dfb9;
-  box-shadow: 0 0 40px rgba(244, 223, 185, 0.3);
-}
-
-.stars {
-  position: absolute;
-  top: 90px;
-  left: 8%;
-  color: #f5d9a8;
-  letter-spacing: 20px;
-  opacity: 0.7;
-}
-
-.cloud {
-  position: absolute;
-  width: 180px;
-  height: 35px;
-  border-radius: 50%;
-  background: rgba(180, 190, 220, 0.08);
-  filter: blur(15px);
-}
-
-.cloud-a {
-  top: 190px;
-  left: 12%;
-}
-
-.cloud-b {
-  top: 240px;
-  right: 14%;
-}
-
-.mountain {
-  position: absolute;
-  bottom: 18%;
-  width: 0;
-  height: 0;
-  border-left: 35vw solid transparent;
-  border-right: 35vw solid transparent;
-  border-bottom: 420px solid #24354b;
-}
-
-.mountain-a {
-  left: -35%;
-}
-
-.mountain-b {
-  right: -35%;
-  border-bottom-color: #1b2a40;
-}
-
-.mountain-c {
-  left: 18%;
-  bottom: 14%;
-  border-left-width: 32vw;
-  border-right-width: 32vw;
-  border-bottom-width: 320px;
-  border-bottom-color: #111c2c;
-}
-
-.mist {
-  position: absolute;
-  left: 0;
-  width: 100%;
-  height: 90px;
-  border-radius: 50%;
-  background: rgba(151, 167, 202, 0.07);
-  filter: blur(30px);
-}
-
-.mist-a {
-  bottom: 24%;
-}
-
-.mist-b {
-  bottom: 17%;
-}
-
-.highway {
-  position: absolute;
-  bottom: -150px;
-  left: 50%;
-  width: 65%;
-  height: 420px;
-  transform: translateX(-50%);
-  background: linear-gradient(180deg, #303345, #11131d);
-  clip-path: polygon(40% 0, 60% 0, 100% 100%, 0 100%);
-}
-
-.road-markings {
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  width: 7px;
-  height: 240px;
-  transform: translateX(-50%);
-  background: repeating-linear-gradient(to bottom, #e8bd87 0 20px, transparent 20px 45px);
-  opacity: 0.45;
-}
-
-/* Header */
-
-.topbar {
+.road-topbar,
+.road-footer,
+.brand-block,
+.music-dock {
   position: relative;
-  z-index: 5;
+  z-index: 1;
+}
+
+.road-topbar {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  gap: 20px;
-  padding: 25px 0;
-}
-
-.brand {
-  display: inline-flex;
   align-items: center;
-  gap: 10px;
-  color: #fffaf5;
-  font-size: 16px;
-  font-weight: 700;
-  letter-spacing: 3px;
-  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  position: relative;
+  z-index: 1000;
 }
 
-.brand-icon {
-  display: grid;
-  place-items: center;
-  width: 36px;
-  height: 36px;
-  border: 1px solid rgba(239, 199, 146, 0.6);
-  border-radius: 50%;
-  color: #f1c58d;
-  font-size: 24px;
-}
-
-.brand-light {
-  color: #e8bd87;
-  font-weight: 400;
-}
-
-.top-note {
+.road-status {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #d6d4e3;
-  font-size: 10px;
-  letter-spacing: 2px;
 }
 
-.top-note i {
-  width: 7px;
-  height: 7px;
+.road-status i {
+  width: 8px;
+  height: 8px;
+  background-color: #4ade80;
   border-radius: 50%;
-  background: #e7c38f;
+  display: inline-block;
+  box-shadow: 0 0 8px #4ade80;
 }
 
-/* Hero */
-
-.hero {
-  position: relative;
-  z-index: 2;
-  width: min(100%, 650px);
-  margin: 0 auto;
-  padding: 35px 0 85px;
-  text-align: center;
+.youtube-link {
+  color: #e6cbab !important;
+  text-decoration: none !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  pointer-events: auto !important;
+  position: relative !important;
+  z-index: 99999 !important;
 }
 
-.eyebrow {
-  margin: 0 0 17px;
-  color: #e9c69a;
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 3px;
+.youtube-link:hover {
+  text-decoration: underline !important;
 }
 
-.hero h1 {
+/* BRAND BLOCK (Shifted lower & fonts made larger) */
+.brand-block {
+  position: absolute;
+  top: 105px;
+  right: 50px;
+  text-align: right;
+}
+
+.brand-block h1 {
+  font-family: 'Great Vibes', cursive;
+  font-size: 7.5rem; /* Font size increased */
+  font-weight: 400;
   margin: 0;
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(43px, 6vw, 70px);
-  font-weight: 500;
-  line-height: 1;
+  letter-spacing: 2px;
+  line-height: 0.9;
 }
 
-.hero h1 em {
-  color: #efc994;
-  font-weight: 500;
+.brand-hindi {
+  font-size: 1.5rem; /* Font size increased */
+  margin: 14px 0 10px 0;
+  font-weight: 700;
+  letter-spacing: 0.5px;
 }
 
-.hero-copy {
-  margin: 20px 0 28px;
-  color: #d0d2df;
-  font-size: 13px;
-  line-height: 1.9;
+.brand-caption {
+  font-size: 1.1rem; /* Font size increased */
+  font-weight: 600;
+  opacity: 0.95;
+  line-height: 1.4;
 }
 
-/* Player */
-
-.player {
-  position: relative;
-  z-index: 4;
-  width: 100%;
-  padding: 23px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 18px;
-  background: rgba(12, 17, 38, 0.78);
-  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.25);
-  backdrop-filter: blur(18px);
-  text-align: left;
-}
-
-.song-header {
+/* TRANSPARENT & BORDERLESS MUSIC DOCK */
+.music-dock {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
   display: flex;
   align-items: center;
-  gap: 18px;
-}
-
-.album {
-  position: relative;
-  flex-shrink: 0;
-  width: 110px;
-  height: 110px;
-  overflow: hidden;
-  border-radius: 10px;
-  background: linear-gradient(155deg, #4c567c, #1a2545 58%, #111627);
-}
-
-.album-moon {
-  position: absolute;
-  top: 16px;
-  right: 18px;
-  width: 25px;
-  height: 25px;
-  border-radius: 50%;
-  background: #f5dcb3;
-}
-
-.album-mountains {
-  position: absolute;
-  right: -15px;
-  bottom: 17px;
-  left: -15px;
-  height: 52px;
-  background: #10182d;
-  clip-path: polygon(0 100%, 27% 15%, 43% 65%, 63% 0, 100% 100%);
-}
-
-.album > span {
-  position: absolute;
-  right: 0;
-  bottom: 5px;
-  left: 0;
-  color: #f0d0a5;
-  font-size: 8px;
-  letter-spacing: 3px;
-  text-align: center;
+  justify-content: space-between;
+  padding: 12px 30px;
+  width: 100%;
+  max-width: 1050px;
+  box-sizing: border-box;
+  gap: 25px;
 }
 
 .song-info {
-  min-width: 0;
-  flex: 1;
-}
-
-.playing-label {
   display: flex;
   align-items: center;
-  gap: 8px;
-  color: #e5bd8c;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
+  gap: 15px;
+  min-width: 260px;
 }
 
-.bars {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  height: 14px;
-}
-
-.bars i {
-  width: 3px;
-  height: 5px;
-  border-radius: 2px;
-  background: #e5bd8c;
-}
-
-.bars.active i {
-  animation: equalize 0.7s ease-in-out infinite alternate;
-}
-
-.bars.active i:nth-child(2) {
-  animation-delay: 0.2s;
-}
-
-.bars.active i:nth-child(3) {
-  animation-delay: 0.4s;
-}
-
-.bars.active i:nth-child(4) {
-  animation-delay: 0.1s;
-}
-
-@keyframes equalize {
-  from { height: 4px; }
-  to { height: 14px; }
-}
-
-.song-info h2 {
-  margin: 8px 0 5px;
-  overflow-wrap: anywhere;
-  color: #fffaf5;
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 26px;
-  font-weight: 600;
-}
-
-.song-info p {
-  margin: 0 0 8px;
-  color: #b9bdcf;
-  font-size: 10px;
-}
-
-.song-info small {
-  color: #e0bc91;
-  font-size: 9px;
-  letter-spacing: 1.5px;
-}
-
-/* Progress */
-
-.progress-wrap {
-  margin-top: 24px;
-}
-
-.progress,
-.volume {
-  display: block;
-  width: 100%;
-  height: 5px;
-  margin: 0;
-  border: 0;
-  border-radius: 20px;
-  appearance: none;
-  -webkit-appearance: none;
-  cursor: pointer;
-}
-
-.progress {
-  background: linear-gradient(to right, #e8bd87 0 var(--progress, 0%), rgba(255, 255, 255, 0.17) var(--progress, 0%) 100%);
-}
-
-.progress::-webkit-slider-thumb,
-.volume::-webkit-slider-thumb {
-  width: 11px;
-  height: 11px;
-  border: 0;
-  border-radius: 50%;
-  appearance: none;
-  -webkit-appearance: none;
-  background: #f2d2a6;
-}
-
-.progress::-moz-range-thumb,
-.volume::-moz-range-thumb {
-  width: 11px;
-  height: 11px;
-  border: 0;
-  border-radius: 50%;
-  background: #f2d2a6;
-}
-
-.time-row {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 9px;
-  color: #aeb4c8;
-  font-size: 10px;
-  font-variant-numeric: tabular-nums;
-}
-
-/* Controls */
-
-.controls {
+.song-art {
+  width: 60px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 24px;
-  margin: 19px 0;
+  font-size: 24px;
 }
 
-.icon-button,
-.play-button {
-  display: grid;
-  place-items: center;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: #d8d8e4;
-  transition: color 0.2s ease, transform 0.2s ease;
-}
-
-.icon-button {
-  min-width: 28px;
-  min-height: 35px;
-  font-size: 19px;
-}
-
-.icon-button:hover,
-.icon-button.selected {
-  color: #efc994;
-}
-
-.icon-button:hover {
-  transform: scale(1.08);
-}
-
-.play-button {
-  width: 53px;
-  height: 53px;
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  border-radius: 50%;
-  background: linear-gradient(145deg, #f2d5ad, #d6a46e);
-  box-shadow: 0 7px 25px rgba(218, 171, 112, 0.2);
-  color: #1c1a26;
-  font-size: 19px;
-}
-
-.play-button:hover {
-  transform: scale(1.06);
-}
-
-.volume-row {
+.song-details {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  padding-top: 15px;
-  border-top: 1px solid rgba(255, 255, 255, 0.09);
-  color: #d6bd9e;
-  font-size: 16px;
-}
-
-.volume {
-  width: 105px;
-  height: 4px;
-  background: linear-gradient(to right, #e8bd87 0 var(--volume, 75%), rgba(255, 255, 255, 0.16) var(--volume, 75%) 100%);
-}
-
-.playlist-toggle {
-  margin-left: auto;
-  padding: 8px 0 8px 8px;
-  border: 0;
-  background: transparent;
-  color: #e9c69a;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 1px;
-}
-
-.playlist-toggle:hover {
-  color: #fff;
-}
-
-/* Playlist */
-
-.playlist {
-  margin-top: 18px;
-  padding-top: 15px;
-  border-top: 1px solid rgba(255, 255, 255, 0.09);
-}
-
-.playlist-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 9px;
-  color: #aeb4c8;
-  font-size: 9px;
-  font-weight: 600;
-  letter-spacing: 1.3px;
-}
-
-.playlist-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  padding: 11px 9px;
-  border: 1px solid transparent;
-  border-radius: 9px;
-  background: transparent;
-  color: #e4e5ee;
-  text-align: left;
-  transition: background 0.2s ease;
-}
-
-.playlist-item:hover {
-  background: rgba(255, 255, 255, 0.045);
-}
-
-.playlist-item.current {
-  border-color: rgba(231, 192, 142, 0.14);
-  background: rgba(231, 192, 142, 0.09);
-}
-
-.track-index {
-  width: 20px;
-  color: #a4abc0;
-  font-size: 10px;
-}
-
-.current .track-index {
-  color: #e9c69a;
-}
-
-.track-details {
-  display: flex;
-  min-width: 0;
-  flex: 1;
   flex-direction: column;
   gap: 4px;
 }
 
-.track-details strong {
-  overflow: hidden;
-  font-size: 12px;
-  font-weight: 500;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.track-details small {
-  overflow: hidden;
-  color: #aeb4c8;
-  font-size: 10px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.track-action {
-  color: #e9c69a;
-  font-size: 12px;
-}
-
-.error-message {
-  margin: 14px 0 0;
-  padding: 10px 12px;
-  border: 1px solid rgba(255, 130, 130, 0.25);
-  border-radius: 8px;
-  background: rgba(255, 100, 100, 0.08);
-  color: #ffc1c1;
+.song-details small {
   font-size: 11px;
-  line-height: 1.6;
+  letter-spacing: 1px;
+  opacity: 0.8;
 }
 
-/* Journey button */
+.song-details strong {
+  font-size: 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+}
 
-.journey-button {
-  display: inline-flex;
+.song-details span {
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.player-controls {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 500px;
+}
+
+.progress-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.progress-slider {
+  flex: 1;
+  appearance: none;
+  height: 5px;
+  border-radius: 2px;
+  background: rgba(230, 203, 171, 0.2);
+  outline: none;
+  cursor: pointer;
+}
+
+.progress-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #e6cbab;
+  cursor: pointer;
+}
+
+.control-buttons {
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  margin-top: 26px;
-  padding: 15px 25px;
-  border: 1px solid rgba(236, 197, 146, 0.7);
-  border-radius: 50px;
-  background: rgba(14, 20, 39, 0.42);
-  color: #f0d0a5;
+  gap: 20px;
+}
+
+.control-buttons button {
+  background: none;
+  border: none;
+  color: #e6cbab;
+  font-size: 16px;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.control-buttons button:hover {
+  opacity: 1;
+}
+
+.control-buttons .play-button {
+  width: 42px;
+  height: 42px;
+  background: #e6cbab;
+  color: #1a140f;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.volume-row input[type="range"] {
+  appearance: none;
+  height: 4px;
+  border-radius: 2px;
+  outline: none;
+}
+
+.volume-row input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #e6cbab;
+  cursor: pointer;
+}
+
+.dock-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
   font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 1.7px;
+  letter-spacing: 1px;
+  opacity: 0.7;
+  gap: 3px;
 }
 
-.journey-button:hover {
-  background: rgba(236, 197, 146, 0.12);
-}
-
-.journey-button span {
-  font-size: 12px;
-}
-
-.footer-note {
-  margin: 20px 0 0;
-  color: #a9afc4;
-  font-size: 9px;
-  letter-spacing: 3px;
-}
-
-/* Truck */
-
-.truck {
+.road-footer {
   position: absolute;
-  z-index: 3;
-  right: 1%;
-  bottom: 1%;
-  width: clamp(300px, 34vw, 520px);
-  animation: truckDrive 8s ease-in-out infinite alternate;
-  transform-origin: center bottom;
+  bottom: 10px;
+  left: 40px;
+  right: 40px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  letter-spacing: 1px;
+  opacity: 0.6;
   pointer-events: none;
 }
 
-.truck img {
-  display: block;
-  width: 100%;
-  height: auto;
-  filter: drop-shadow(0 15px 15px rgba(0, 0, 0, 0.25));
-}
-
-@keyframes truckDrive {
-  0% { transform: translateX(0) translateY(0); }
-  50% { transform: translateX(-35px) translateY(-3px); }
-  100% { transform: translateX(0) translateY(0); }
-}
-
-/* Footer */
-
-.footer {
-  position: relative;
-  z-index: 4;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 15px;
-  padding: 19px 0 22px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  color: #9ea6bc;
-  font-size: 9px;
-  letter-spacing: 1.5px;
-}
-
-/* Responsive */
-
-@media (max-width: 900px) {
-  .hero {
-    padding-top: 35px;
-  }
-
-  .truck {
-    width: clamp(250px, 38vw, 360px);
-    right: -2%;
-  }
-
-  .mountain {
-    bottom: 18%;
-  }
-}
-
-@media (max-width: 600px) {
-  .app {
-    padding: 0 18px;
-  }
-
-  .topbar {
-    padding: 19px 0;
-  }
-
-  .brand {
-    gap: 8px;
-    font-size: 13px;
-    letter-spacing: 2px;
-  }
-
-  .brand-icon {
-    width: 32px;
-    height: 32px;
-    font-size: 20px;
-  }
-
-  .top-note {
-    gap: 6px;
-    font-size: 8px;
-    letter-spacing: 1px;
-  }
-
-  .hero {
-    padding-top: 32px;
-    padding-bottom: 35px;
-  }
-
-  .eyebrow {
-    font-size: 8px;
-    letter-spacing: 1.7px;
-  }
-
-  .hero h1 {
-    font-size: clamp(42px, 11vw, 58px);
-  }
-
-  .hero-copy {
-    margin: 17px 0 24px;
-    font-size: 11px;
-  }
-
-  .player {
-    padding: 17px 14px;
-    border-radius: 15px;
-  }
-
-  .song-header {
-    gap: 13px;
-  }
-
-  .album {
-    width: 86px;
-    height: 86px;
-  }
-
-  .album-moon {
-    top: 12px;
-    right: 15px;
-    width: 22px;
-    height: 22px;
-  }
-
-  .album-mountains {
-    bottom: 14px;
-    height: 40px;
-  }
-
-  .album > span {
-    font-size: 7px;
-  }
-
-  .song-info h2 {
-    font-size: 21px;
-  }
-
-  .song-info p {
-    font-size: 9px;
-    line-height: 1.5;
-  }
-
-  .playing-label {
-    font-size: 8px;
-    letter-spacing: 1px;
-  }
-
-  .controls {
-    gap: clamp(13px, 5vw, 24px);
-  }
-
-  .play-button {
-    width: 48px;
-    height: 48px;
-  }
-
-  .playlist-heading {
-    font-size: 8px;
-    letter-spacing: 0.8px;
-  }
-
-  .playlist-item {
-    gap: 9px;
-    padding: 11px 5px;
-  }
-
-  .track-details strong {
-    font-size: 11px;
-  }
-
-  .journey-button {
-    margin-top: 23px;
-    padding: 13px 20px;
-    font-size: 9px;
-  }
-
-  .truck {
-    position: relative;
-    right: auto;
-    bottom: auto;
-    width: min(85vw, 380px);
-    margin: 0 auto 10px;
-    animation-duration: 8s;
-  }
-
-  .footer {
-    flex-direction: column;
-    justify-content: center;
-    padding: 18px 0;
-    font-size: 8px;
-    text-align: center;
-  }
-
-  .moon {
-    top: 100px;
-    right: 10%;
-    width: 55px;
-    height: 55px;
-  }
-
-  .mountain {
-    bottom: 12%;
-    border-bottom-width: 260px;
-  }
-
-  .mountain-c {
-    bottom: 11%;
-    border-bottom-width: 220px;
-  }
-
-  .highway {
-    width: 100%;
-  }
-
-  .road-markings {
-    height: 170px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    scroll-behavior: auto !important;
-    animation: none !important;
-    transition: none !important;
-  }
+.player-message {
+  color: #f87171;
+  font-size: 12px;
+  text-align: center;
+  margin: 0;
 }

@@ -15,10 +15,15 @@ body {
   min-height: 100vh;
 }
 
-button, input {
+button,
+input {
   font: inherit;
 }
 
 button {
   -webkit-tap-highlight-color: transparent;
+}
+
+#root {
+  min-height: 100vh;
 }
