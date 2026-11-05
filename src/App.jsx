@@ -84,6 +84,7 @@ export default function App() {
         mount.id = "melodyroads-youtube-player";
         playerHostRef.current.appendChild(mount);
 
+        // Hamesha latest localStorage value uthana
         const initialIndex = Number(localStorage.getItem("melodyroads_index") || 0);
 
         playerRef.current = new YT.Player(mount, {
@@ -102,6 +103,8 @@ export default function App() {
 
               setPlayerReady(true);
               event.target.setVolume(volume);
+              
+              // Saved index par playlist cue karna
               event.target.cuePlaylist({
                 list: PLAYLIST_ID,
                 listType: "playlist",
@@ -133,8 +136,10 @@ export default function App() {
                     : "",
                 });
 
-                setPlaylistIndex(currentIndex);
-                localStorage.setItem("melodyroads_index", currentIndex);
+                if (!isNaN(currentIndex)) {
+                  setPlaylistIndex(currentIndex);
+                  localStorage.setItem("melodyroads_index", currentIndex);
+                }
                 setDuration(player.getDuration?.() || 0);
               }
 
@@ -177,9 +182,11 @@ export default function App() {
       if (player?.getCurrentTime && player?.getDuration) {
         setCurrentTime(player.getCurrentTime() || 0);
         setDuration(player.getDuration() || 0);
-        const idx = player.getPlaylistIndex?.() ?? 0;
-        setPlaylistIndex(idx);
-        localStorage.setItem("melodyroads_index", idx);
+        const idx = player.getPlaylistIndex?.();
+        if (idx !== undefined && !isNaN(idx)) {
+          setPlaylistIndex(idx);
+          localStorage.setItem("melodyroads_index", idx);
+        }
       }
     }, 1000);
 
@@ -220,13 +227,26 @@ export default function App() {
       playerRef.current?.seekTo(0, true);
     } else {
       playerRef.current?.previousVideo();
+      setTimeout(() => {
+        const idx = playerRef.current?.getPlaylistIndex?.();
+        if (idx !== undefined && !isNaN(idx)) {
+          setPlaylistIndex(idx);
+          localStorage.setItem("melodyroads_index", idx);
+        }
+      }, 500);
     }
   }
 
   function nextSong() {
-    if (playerReady) {
-      playerRef.current?.nextVideo();
-    }
+    if (!playerReady) return;
+    playerRef.current?.nextVideo();
+    setTimeout(() => {
+      const idx = playerRef.current?.getPlaylistIndex?.();
+      if (idx !== undefined && !isNaN(idx)) {
+        setPlaylistIndex(idx);
+        localStorage.setItem("melodyroads_index", idx);
+      }
+    }, 500);
   }
 
   function seekSong(event) {
@@ -272,7 +292,7 @@ export default function App() {
         </a>
       </header>
 
-      {/* START ENGINE BUTTON (PLACED LOWER DOWN FROM ON ROAD) */}
+      {/* START ENGINE BUTTON */}
       <div style={{ display: "flex", justifyContent: "center", marginTop: "30px", zIndex: 10 }}>
         <button
           onClick={handleStartEngine}
