@@ -1,12 +1,20 @@
 @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
 
+/* GLOBAL STYLES FOR ALL DEVICES */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+}
+
 .road-page {
   position: relative;
   min-height: 100vh;
   width: 100vw;
   box-sizing: border-box;
   padding: 20px 40px;
-  overflow: hidden;
   font-family: sans-serif;
   color: #e6cbab;
   background-image: url('/images/indian-truck.png');
@@ -18,7 +26,7 @@
 .background-shade {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.25);
+  background: rgba(0, 0, 0, 0.35);
   z-index: 0;
   pointer-events: none;
 }
@@ -71,7 +79,7 @@
   text-decoration: underline !important;
 }
 
-/* BRAND BLOCK (Shifted lower & fonts made larger) */
+/* BRAND BLOCK (Desktop Default) */
 .brand-block {
   position: absolute;
   top: 105px;
@@ -81,7 +89,7 @@
 
 .brand-block h1 {
   font-family: 'Great Vibes', cursive;
-  font-size: 7.5rem; /* Font size increased */
+  font-size: 7.5rem;
   font-weight: 400;
   margin: 0;
   letter-spacing: 2px;
@@ -89,20 +97,20 @@
 }
 
 .brand-hindi {
-  font-size: 1.5rem; /* Font size increased */
+  font-size: 1.5rem;
   margin: 14px 0 10px 0;
   font-weight: 700;
   letter-spacing: 0.5px;
 }
 
 .brand-caption {
-  font-size: 1.1rem; /* Font size increased */
+  font-size: 1.1rem;
   font-weight: 600;
   opacity: 0.95;
   line-height: 1.4;
 }
 
-/* TRANSPARENT & BORDERLESS MUSIC DOCK */
+/* RESPONSIVE MUSIC DOCK */
 .music-dock {
   background: transparent !important;
   border: none !important;
@@ -122,17 +130,26 @@
   display: flex;
   align-items: center;
   gap: 15px;
-  min-width: 260px;
+  min-width: 240px;
 }
 
 .song-art {
   width: 60px;
   height: 60px;
+  border-radius: 50%;
+  overflow: hidden;
   background: rgba(255, 255, 255, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 24px;
+  flex-shrink: 0;
+}
+
+.song-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .song-details {
@@ -148,11 +165,11 @@
 }
 
 .song-details strong {
-  font-size: 16px;
+  font-size: 15px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 220px;
+  max-width: 200px;
 }
 
 .song-details span {
@@ -188,89 +205,3 @@
 
 .progress-slider::-webkit-slider-thumb {
   appearance: none;
-  width: 11px;
-  height: 11px;
-  border-radius: 50%;
-  background: #e6cbab;
-  cursor: pointer;
-}
-
-.control-buttons {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 20px;
-}
-
-.control-buttons button {
-  background: none;
-  border: none;
-  color: #e6cbab;
-  font-size: 16px;
-  cursor: pointer;
-  opacity: 0.8;
-  transition: opacity 0.2s;
-}
-
-.control-buttons button:hover {
-  opacity: 1;
-}
-
-.control-buttons .play-button {
-  width: 42px;
-  height: 42px;
-  background: #e6cbab;
-  color: #1a140f;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  font-weight: bold;
-}
-
-.volume-row input[type="range"] {
-  appearance: none;
-  height: 4px;
-  border-radius: 2px;
-  outline: none;
-}
-
-.volume-row input[type="range"]::-webkit-slider-thumb {
-  appearance: none;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #e6cbab;
-  cursor: pointer;
-}
-
-.dock-footer {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  font-size: 10px;
-  letter-spacing: 1px;
-  opacity: 0.7;
-  gap: 3px;
-}
-
-.road-footer {
-  position: absolute;
-  bottom: 10px;
-  left: 40px;
-  right: 40px;
-  display: flex;
-  justify-content: space-between;
-  font-size: 11px;
-  letter-spacing: 1px;
-  opacity: 0.6;
-  pointer-events: none;
-}
-
-.player-message {
-  color: #f87171;
-  font-size: 12px;
-  text-align: center;
-  margin: 0;
-}
