@@ -84,7 +84,6 @@ export default function App() {
         mount.id = "melodyroads-youtube-player";
         playerHostRef.current.appendChild(mount);
 
-        // Hamesha latest localStorage value uthana
         const initialIndex = Number(localStorage.getItem("melodyroads_index") || 0);
 
         playerRef.current = new YT.Player(mount, {
@@ -104,7 +103,7 @@ export default function App() {
               setPlayerReady(true);
               event.target.setVolume(volume);
               
-              // Saved index par playlist cue karna
+              // Sirf cue karega, autoplay nahi karega
               event.target.cuePlaylist({
                 list: PLAYLIST_ID,
                 listType: "playlist",
@@ -220,33 +219,35 @@ export default function App() {
     }
   }
 
+  // Next / Previous dabane par sirf cue hoga, play nahi hoga
   function previousSong() {
-    if (!playerReady) return;
+    if (!playerReady || !playerRef.current) return;
+    const player = playerRef.current;
+    
+    let newIndex = playlistIndex - 1;
+    if (newIndex < 0) newIndex = 0;
 
-    if (currentTime > 3) {
-      playerRef.current?.seekTo(0, true);
-    } else {
-      playerRef.current?.previousVideo();
-      setTimeout(() => {
-        const idx = playerRef.current?.getPlaylistIndex?.();
-        if (idx !== undefined && !isNaN(idx)) {
-          setPlaylistIndex(idx);
-          localStorage.setItem("melodyroads_index", idx);
-        }
-      }, 500);
-    }
+    player.cuePlaylist({
+      list: PLAYLIST_ID,
+      listType: "playlist",
+      index: newIndex,
+    });
+    setPlaylistIndex(newIndex);
+    localStorage.setItem("melodyroads_index", newIndex);
   }
 
   function nextSong() {
-    if (!playerReady) return;
-    playerRef.current?.nextVideo();
-    setTimeout(() => {
-      const idx = playerRef.current?.getPlaylistIndex?.();
-      if (idx !== undefined && !isNaN(idx)) {
-        setPlaylistIndex(idx);
-        localStorage.setItem("melodyroads_index", idx);
-      }
-    }, 500);
+    if (!playerReady || !playerRef.current) return;
+    const player = playerRef.current;
+    
+    let newIndex = playlistIndex + 1;
+    player.cuePlaylist({
+      list: PLAYLIST_ID,
+      listType: "playlist",
+      index: newIndex,
+    });
+    setPlaylistIndex(newIndex);
+    localStorage.setItem("melodyroads_index", newIndex);
   }
 
   function seekSong(event) {
