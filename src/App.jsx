@@ -41,6 +41,7 @@ function loadYouTubeAPI() {
 export default function App() {
   const playerRef = useRef(null);
   const playerHostRef = useRef(null);
+  const allowPlayRef = useRef(false); // Yeh track karega ki user ne khud play dabaya ya nahi
 
   const [clock, setClock] = useState(new Date());
   const [playerReady, setPlayerReady] = useState(false);
@@ -49,7 +50,6 @@ export default function App() {
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(75);
   
-  // LocalStorage se last saved track index load karna
   const [playlistIndex, setPlaylistIndex] = useState(() => {
     const saved = localStorage.getItem("melodyroads_index");
     return saved !== null ? Number(saved) : 0;
@@ -102,17 +102,13 @@ export default function App() {
 
               setPlayerReady(true);
               event.target.setVolume(volume);
+              allowPlayRef.current = false;
               
-              // Pehle cue karenge aur turant pause rakhenge taaki autoplay na ho
               event.target.cuePlaylist({
                 list: PLAYLIST_ID,
                 listType: "playlist",
                 index: initialIndex,
               });
-
-              setTimeout(() => {
-                event.target.pauseVideo();
-              }, 300);
             },
 
             onStateChange: (event) => {
@@ -120,6 +116,13 @@ export default function App() {
 
               const player = event.target;
               const state = event.data;
+
+              // Agar user ne khud play nahi dabaya aur state PLAYING ho gayi, toh turant pause kar do!
+              if (state === YT.PlayerState.PLAYING && !allowPlayRef.current) {
+                player.pauseVideo();
+                setIsPlaying(false);
+                return;
+              }
 
               setIsPlaying(state === YT.PlayerState.PLAYING);
 
@@ -215,15 +218,16 @@ export default function App() {
     if (!playerReady || !player) return;
 
     if (isPlaying) {
+      allowPlayRef.current = false;
       player.pauseVideo();
     } else {
+      allowPlayRef.current = true; // User ne explicit play kiya
       player.playVideo();
       player.unMute?.();
       player.setVolume(volume);
     }
   }
 
-  // Previous Song: Sirf index change karke cue karega aur pause kar dega
   function previousSong() {
     if (!playerReady || !playerRef.current) return;
     const player = playerRef.current;
@@ -231,6 +235,7 @@ export default function App() {
     let newIndex = playlistIndex - 1;
     if (newIndex < 0) newIndex = 0;
 
+    allowPlayRef.current = false; // Auto-play block flag ON
     setPlaylistIndex(newIndex);
     localStorage.setItem("melodyroads_index", newIndex);
     setIsPlaying(false);
@@ -240,19 +245,15 @@ export default function App() {
       listType: "playlist",
       index: newIndex,
     });
-
-    setTimeout(() => {
-      player.pauseVideo();
-    }, 150);
   }
 
-  // Next Song: Sirf index change karke cue karega aur pause kar dega
   function nextSong() {
     if (!playerReady || !playerRef.current) return;
     const player = playerRef.current;
     
     let newIndex = playlistIndex + 1;
 
+    allowPlayRef.current = false; // Auto-play block flag ON
     setPlaylistIndex(newIndex);
     localStorage.setItem("melodyroads_index", newIndex);
     setIsPlaying(false);
@@ -262,10 +263,6 @@ export default function App() {
       listType: "playlist",
       index: newIndex,
     });
-
-    setTimeout(() => {
-      player.pauseVideo();
-    }, 150);
   }
 
   function seekSong(event) {
