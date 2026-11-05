@@ -205,3 +205,218 @@ html, body {
 
 .progress-slider::-webkit-slider-thumb {
   appearance: none;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #e6cbab;
+  cursor: pointer;
+}
+
+.control-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.control-buttons button {
+  background: none;
+  border: none;
+  color: #e6cbab;
+  font-size: 16px;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.control-buttons button:hover {
+  opacity: 1;
+}
+
+.control-buttons .play-button {
+  width: 42px;
+  height: 42px;
+  background: #e6cbab;
+  color: #1a140f;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+}
+
+.volume-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.volume-row input[type="range"] {
+  appearance: none;
+  height: 4px;
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+.volume-row input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #e6cbab;
+  cursor: pointer;
+}
+
+.dock-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-size: 10px;
+  letter-spacing: 1px;
+  opacity: 0.7;
+  gap: 3px;
+}
+
+.road-footer {
+  position: absolute;
+  bottom: 10px;
+  left: 40px;
+  right: 40px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  letter-spacing: 1px;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.player-message {
+  color: #f87171;
+  font-size: 12px;
+  text-align: center;
+  margin: 0;
+}
+
+
+/* ==========================================
+   MEDIA QUERIES FOR RESPONSIVE DEVICES
+   ========================================== */
+
+/* Tablets & iPads (Screen width 1024px ya usse kam) */
+@media screen and (max-width: 1024px) {
+  .road-page {
+    padding: 15px 20px;
+  }
+
+  .brand-block {
+    top: 90px;
+    right: 30px;
+  }
+
+  .brand-block h1 {
+    font-size: 5.5rem;
+  }
+
+  .brand-hindi {
+    font-size: 1.3rem;
+  }
+
+  .brand-caption {
+    font-size: 1rem;
+  }
+
+  .music-dock {
+    max-width: 90%;
+    padding: 10px 20px;
+  }
+}
+
+/* Mobile Phones & iPhones (Screen width 768px ya usse kam) */
+@media screen and (max-width: 768px) {
+  .road-page {
+    padding: 12px 15px;
+    overflow-y: auto; /* Mobile par scrolling allow rahegi agar content bada ho toh */
+  }
+
+  /* Mobile par brand block ko center ya adjust karna taaki text overlap na ho */
+  .brand-block {
+    position: relative;
+    top: 20px;
+    right: auto;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .brand-block h1 {
+    font-size: 4rem;
+  }
+
+  .brand-hindi {
+    font-size: 1.1rem;
+    margin: 8px 0 6px 0;
+  }
+
+  .brand-caption {
+    font-size: 0.85rem;
+  }
+
+  /* Music dock ko mobile ke liye stack karna */
+  .music-dock {
+    position: relative !important;
+    bottom: auto !important;
+    left: auto !important;
+    transform: none !important;
+    flex-direction: column;
+    background: rgba(20, 15, 10, 0.7) !important; /* Mobile par thoda background shade taaki clearly dikhe */
+    backdrop-filter: blur(10px) !important;
+    border-radius: 16px;
+    padding: 15px;
+    gap: 15px;
+    margin-top: 30px;
+    max-width: 100%;
+  }
+
+  .song-info {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .player-controls {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .dock-footer {
+    align-items: center;
+    text-align: center;
+  }
+
+  .road-footer {
+    position: relative;
+    bottom: auto;
+    left: auto;
+    right: auto;
+    margin-top: 20px;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    text-align: center;
+  }
+}
+
+/* Very Small Mobiles (iPhone SE, etc. width 480px ya usse kam) */
+@media screen and (max-width: 480px) {
+  .brand-block h1 {
+    font-size: 3.2rem;
+  }
+
+  .song-details strong {
+    max-width: 160px;
+  }
+}
