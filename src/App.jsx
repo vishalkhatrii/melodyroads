@@ -103,11 +103,16 @@ export default function App() {
               setPlayerReady(true);
               event.target.setVolume(volume);
               
+              // Pehle cue karenge aur turant pause rakhenge taaki autoplay na ho
               event.target.cuePlaylist({
                 list: PLAYLIST_ID,
                 listType: "playlist",
                 index: initialIndex,
               });
+
+              setTimeout(() => {
+                event.target.pauseVideo();
+              }, 300);
             },
 
             onStateChange: (event) => {
@@ -218,7 +223,7 @@ export default function App() {
     }
   }
 
-  // Next / Previous dabane par sirf cue hoga aur turant pause ho jayega (no autoplay)
+  // Previous Song: Sirf index change karke cue karega aur pause kar dega
   function previousSong() {
     if (!playerReady || !playerRef.current) return;
     const player = playerRef.current;
@@ -226,35 +231,41 @@ export default function App() {
     let newIndex = playlistIndex - 1;
     if (newIndex < 0) newIndex = 0;
 
+    setPlaylistIndex(newIndex);
+    localStorage.setItem("melodyroads_index", newIndex);
+    setIsPlaying(false);
+
     player.cuePlaylist({
       list: PLAYLIST_ID,
       listType: "playlist",
       index: newIndex,
     });
-    setPlaylistIndex(newIndex);
-    localStorage.setItem("melodyroads_index", newIndex);
 
     setTimeout(() => {
       player.pauseVideo();
-    }, 200);
+    }, 150);
   }
 
+  // Next Song: Sirf index change karke cue karega aur pause kar dega
   function nextSong() {
     if (!playerReady || !playerRef.current) return;
     const player = playerRef.current;
     
     let newIndex = playlistIndex + 1;
+
+    setPlaylistIndex(newIndex);
+    localStorage.setItem("melodyroads_index", newIndex);
+    setIsPlaying(false);
+
     player.cuePlaylist({
       list: PLAYLIST_ID,
       listType: "playlist",
       index: newIndex,
     });
-    setPlaylistIndex(newIndex);
-    localStorage.setItem("melodyroads_index", newIndex);
 
     setTimeout(() => {
       player.pauseVideo();
-    }, 200);
+    }, 150);
   }
 
   function seekSong(event) {
