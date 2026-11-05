@@ -103,7 +103,6 @@ export default function App() {
               setPlayerReady(true);
               event.target.setVolume(volume);
               
-              // Sirf cue karega, autoplay nahi karega
               event.target.cuePlaylist({
                 list: PLAYLIST_ID,
                 listType: "playlist",
@@ -219,7 +218,7 @@ export default function App() {
     }
   }
 
-  // Next / Previous dabane par sirf cue hoga, play nahi hoga
+  // Next / Previous dabane par sirf cue hoga aur turant pause ho jayega (no autoplay)
   function previousSong() {
     if (!playerReady || !playerRef.current) return;
     const player = playerRef.current;
@@ -234,6 +233,10 @@ export default function App() {
     });
     setPlaylistIndex(newIndex);
     localStorage.setItem("melodyroads_index", newIndex);
+
+    setTimeout(() => {
+      player.pauseVideo();
+    }, 200);
   }
 
   function nextSong() {
@@ -248,6 +251,10 @@ export default function App() {
     });
     setPlaylistIndex(newIndex);
     localStorage.setItem("melodyroads_index", newIndex);
+
+    setTimeout(() => {
+      player.pauseVideo();
+    }, 200);
   }
 
   function seekSong(event) {
