@@ -353,6 +353,7 @@ html, body {
   }
 
   .brand-block h1 {
+<<<<<<< HEAD
     font-size: 3.2rem; /* Font size chota kiya taaki screen me fit ho */
   }
 
@@ -364,6 +365,19 @@ html, body {
   .brand-caption {
     font-size: 0.75rem;
     line-height: 1.1;
+=======
+    font-size: 3.5rem; /* Font size chota kiya taaki screen me fit ho */
+  }
+
+  .brand-hindi {
+    font-size: 1rem;
+    margin: 4px 0;
+  }
+
+  .brand-caption {
+    font-size: 0.8rem;
+    line-height: 1.2;
+>>>>>>> c1d6c6a322f633686397c1d4227ff761fb4a8cc0
   }
 
   /* Mobile Music Dock (Completely Responsive & Fit) */
@@ -383,7 +397,11 @@ html, body {
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
+<<<<<<< HEAD
     gap: 8px;
+=======
+    gap: 10px;
+>>>>>>> c1d6c6a322f633686397c1d4227ff761fb4a8cc0
     margin-bottom: 5px;
   }
 
@@ -395,17 +413,30 @@ html, body {
   }
 
   .song-art {
+<<<<<<< HEAD
     width: 40px;
     height: 40px;
   }
 
   .song-details strong {
     font-size: 12px;
+=======
+    width: 45px;
+    height: 45px;
+  }
+
+  .song-details strong {
+    font-size: 13px;
+>>>>>>> c1d6c6a322f633686397c1d4227ff761fb4a8cc0
     max-width: 230px;
   }
 
   .song-details span {
+<<<<<<< HEAD
     font-size: 9px;
+=======
+    font-size: 10px;
+>>>>>>> c1d6c6a322f633686397c1d4227ff761fb4a8cc0
   }
 
   .player-controls {
@@ -415,11 +446,16 @@ html, body {
   }
 
   .progress-row {
+<<<<<<< HEAD
     font-size: 9px;
+=======
+    font-size: 10px;
+>>>>>>> c1d6c6a322f633686397c1d4227ff761fb4a8cc0
     gap: 8px;
   }
 
   .control-buttons {
+<<<<<<< HEAD
     gap: 20px;
   }
 
@@ -427,6 +463,15 @@ html, body {
     width: 32px;
     height: 32px;
     font-size: 12px;
+=======
+    gap: 25px;
+  }
+
+  .control-buttons .play-button {
+    width: 34px;
+    height: 34px;
+    font-size: 13px;
+>>>>>>> c1d6c6a322f633686397c1d4227ff761fb4a8cc0
   }
 
   .volume-row {
