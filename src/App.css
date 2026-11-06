@@ -1,12 +1,21 @@
 @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
 
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  background-color: #120d09;
+}
+
 .road-page {
   position: relative;
   min-height: 100vh;
   width: 100vw;
   box-sizing: border-box;
   padding: 20px 40px;
-  overflow: hidden;
   font-family: sans-serif;
   color: #e6cbab;
   background-image: url('/images/indian-truck.png');
@@ -18,7 +27,7 @@
 .background-shade {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.25);
+  background: rgba(0, 0, 0, 0.35);
   z-index: 0;
   pointer-events: none;
 }
@@ -26,7 +35,8 @@
 .road-topbar,
 .road-footer,
 .brand-block,
-.music-dock {
+.music-dock,
+.engine-container {
   position: relative;
   z-index: 1;
 }
@@ -38,8 +48,6 @@
   font-size: 14px;
   font-weight: 500;
   letter-spacing: 1px;
-  position: relative;
-  z-index: 1000;
 }
 
 .road-status {
@@ -63,15 +71,33 @@
   font-weight: 600 !important;
   cursor: pointer !important;
   pointer-events: auto !important;
-  position: relative !important;
-  z-index: 99999 !important;
 }
 
-.youtube-link:hover {
-  text-decoration: underline !important;
+.engine-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
 }
 
-/* BRAND BLOCK (Shifted lower & fonts made larger) */
+.engine-btn {
+  background: rgba(50, 35, 24, 0.9);
+  border: 1px solid rgba(212, 175, 55, 0.5);
+  color: #e6cbab;
+  padding: 8px 28px;
+  border-radius: 30px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+
+/* ==========================================
+   DESKTOP VERSION (Default Layout)
+   ========================================== */
 .brand-block {
   position: absolute;
   top: 105px;
@@ -81,7 +107,7 @@
 
 .brand-block h1 {
   font-family: 'Great Vibes', cursive;
-  font-size: 7.5rem; /* Font size increased */
+  font-size: 7.5rem;
   font-weight: 400;
   margin: 0;
   letter-spacing: 2px;
@@ -89,21 +115,23 @@
 }
 
 .brand-hindi {
-  font-size: 1.5rem; /* Font size increased */
+  font-size: 1.5rem;
   margin: 14px 0 10px 0;
   font-weight: 700;
-  letter-spacing: 0.5px;
 }
 
 .brand-caption {
-  font-size: 1.1rem; /* Font size increased */
+  font-size: 1.1rem;
   font-weight: 600;
   opacity: 0.95;
   line-height: 1.4;
 }
 
-/* TRANSPARENT & BORDERLESS MUSIC DOCK */
 .music-dock {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
@@ -116,6 +144,7 @@
   max-width: 1050px;
   box-sizing: border-box;
   gap: 25px;
+  z-index: 9999;
 }
 
 .song-info {
@@ -128,11 +157,20 @@
 .song-art {
   width: 60px;
   height: 60px;
+  border-radius: 50%;
+  overflow: hidden;
   background: rgba(255, 255, 255, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 24px;
+  flex-shrink: 0;
+}
+
+.song-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .song-details {
@@ -209,11 +247,6 @@
   font-size: 16px;
   cursor: pointer;
   opacity: 0.8;
-  transition: opacity 0.2s;
-}
-
-.control-buttons button:hover {
-  opacity: 1;
 }
 
 .control-buttons .play-button {
@@ -227,6 +260,16 @@
   justify-content: center;
   font-size: 16px;
   font-weight: bold;
+  cursor: pointer;
+  border: none;
+}
+
+.volume-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 4px;
 }
 
 .volume-row input[type="range"] {
@@ -234,6 +277,8 @@
   height: 4px;
   border-radius: 2px;
   outline: none;
+  cursor: pointer;
+  width: 100px;
 }
 
 .volume-row input[type="range"]::-webkit-slider-thumb {
@@ -257,7 +302,7 @@
 
 .road-footer {
   position: absolute;
-  bottom: 10px;
+  bottom: 15px;
   left: 40px;
   right: 40px;
   display: flex;
@@ -273,4 +318,126 @@
   font-size: 12px;
   text-align: center;
   margin: 0;
+}
+
+
+/* ==========================================
+   MOBILE VERSION (Phone Layout - max-width: 900px)
+   ========================================== */
+@media screen and (max-width: 900px) {
+  .road-page {
+    padding: 10px 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 100vh;
+    height: 100vh;
+    overflow: hidden; /* Phone screen me scroll hatane ke liye taaki sab ek baar me fit aaye */
+  }
+
+  .engine-container {
+    margin-top: 5px;
+  }
+
+  .engine-btn {
+    padding: 6px 18px;
+    font-size: 11px;
+  }
+
+  .brand-block {
+    position: relative;
+    top: unset;
+    right: unset;
+    text-align: center;
+    margin: 5px 0;
+  }
+
+  .brand-block h1 {
+    font-size: 3.2rem; /* Font size chota kiya taaki screen me fit ho */
+  }
+
+  .brand-hindi {
+    font-size: 0.95rem;
+    margin: 3px 0;
+  }
+
+  .brand-caption {
+    font-size: 0.75rem;
+    line-height: 1.1;
+  }
+
+  /* Mobile Music Dock (Completely Responsive & Fit) */
+  .music-dock {
+    position: relative !important;
+    bottom: unset !important;
+    left: unset !important;
+    transform: none !important;
+    background: rgba(18, 12, 8, 0.9) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(230, 203, 171, 0.2) !important;
+    border-radius: 14px;
+    display: flex;
+    flex-direction: column;
+    padding: 10px 12px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    gap: 8px;
+    margin-bottom: 5px;
+  }
+
+  .song-info {
+    width: 100%;
+    justify-content: flex-start;
+    min-width: unset;
+    gap: 10px;
+  }
+
+  .song-art {
+    width: 40px;
+    height: 40px;
+  }
+
+  .song-details strong {
+    font-size: 12px;
+    max-width: 230px;
+  }
+
+  .song-details span {
+    font-size: 9px;
+  }
+
+  .player-controls {
+    width: 100%;
+    max-width: 100%;
+    gap: 4px;
+  }
+
+  .progress-row {
+    font-size: 9px;
+    gap: 8px;
+  }
+
+  .control-buttons {
+    gap: 20px;
+  }
+
+  .control-buttons .play-button {
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+  }
+
+  .volume-row {
+    display: none; /* Phone screen ki jagah bachane ke liye volume bar hide kiya hai taaki player cut na ho */
+  }
+
+  .dock-footer {
+    display: none; /* Extra text hataya taaki mobile par player ekdum compact aur clean rahe */
+  }
+
+  .road-footer {
+    display: none;
+  }
 }

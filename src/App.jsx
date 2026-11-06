@@ -41,6 +41,7 @@ function loadYouTubeAPI() {
 export default function App() {
   const playerRef = useRef(null);
   const playerHostRef = useRef(null);
+  const allowPlayRef = useRef(false);
 
   const [clock, setClock] = useState(new Date());
   const [playerReady, setPlayerReady] = useState(false);
@@ -49,7 +50,6 @@ export default function App() {
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(75);
   
-  // LocalStorage se last saved track index load karna
   const [playlistIndex, setPlaylistIndex] = useState(() => {
     const saved = localStorage.getItem("melodyroads_index");
     return saved !== null ? Number(saved) : 0;
@@ -58,7 +58,7 @@ export default function App() {
   const [error, setError] = useState("");
 
   const [song, setSong] = useState({
-    title: "Loading your playlist...",
+    title: "Tap Play to start...",
     channel: "MelodyRoads Radio",
     thumbnail: "",
   });
@@ -91,7 +91,8 @@ export default function App() {
           height: "200",
           playerVars: {
             autoplay: 0,
-            controls: 1,
+            controls: 0,
+            disablekb: 1,
             playsinline: 1,
             rel: 0,
             origin: window.location.origin,
@@ -102,6 +103,8 @@ export default function App() {
 
               setPlayerReady(true);
               event.target.setVolume(volume);
+              allowPlayRef.current = false;
+              
               event.target.cuePlaylist({
                 list: PLAYLIST_ID,
                 listType: "playlist",
@@ -114,6 +117,12 @@ export default function App() {
 
               const player = event.target;
               const state = event.data;
+
+              if (state === YT.PlayerState.PLAYING && !allowPlayRef.current) {
+                player.pauseVideo();
+                setIsPlaying(false);
+                return;
+              }
 
               setIsPlaying(state === YT.PlayerState.PLAYING);
 
@@ -133,8 +142,10 @@ export default function App() {
                     : "",
                 });
 
-                setPlaylistIndex(currentIndex);
-                localStorage.setItem("melodyroads_index", currentIndex);
+                if (!isNaN(currentIndex)) {
+                  setPlaylistIndex(currentIndex);
+                  localStorage.setItem("melodyroads_index", currentIndex);
+                }
                 setDuration(player.getDuration?.() || 0);
               }
 
@@ -145,9 +156,7 @@ export default function App() {
 
             onError: () => {
               if (!cancelled) {
-                setError(
-                  "Playlist load nahi hui. Playlist availability aur embedding settings check karo."
-                );
+                setError("Playlist load nahi hui. Check connection.");
               }
             },
           },
@@ -177,9 +186,11 @@ export default function App() {
       if (player?.getCurrentTime && player?.getDuration) {
         setCurrentTime(player.getCurrentTime() || 0);
         setDuration(player.getDuration() || 0);
-        const idx = player.getPlaylistIndex?.() ?? 0;
-        setPlaylistIndex(idx);
-        localStorage.setItem("melodyroads_index", idx);
+        const idx = player.getPlaylistIndex?.();
+        if (idx !== undefined && !isNaN(idx)) {
+          setPlaylistIndex(idx);
+          localStorage.setItem("melodyroads_index", idx);
+        }
       }
     }, 1000);
 
@@ -205,8 +216,10 @@ export default function App() {
     if (!playerReady || !player) return;
 
     if (isPlaying) {
+      allowPlayRef.current = false;
       player.pauseVideo();
     } else {
+      allowPlayRef.current = true;
       player.playVideo();
       player.unMute?.();
       player.setVolume(volume);
@@ -214,19 +227,40 @@ export default function App() {
   }
 
   function previousSong() {
-    if (!playerReady) return;
+    if (!playerReady || !playerRef.current) return;
+    const player = playerRef.current;
+    
+    let newIndex = playlistIndex - 1;
+    if (newIndex < 0) newIndex = 0;
 
-    if (currentTime > 3) {
-      playerRef.current?.seekTo(0, true);
-    } else {
-      playerRef.current?.previousVideo();
-    }
+    allowPlayRef.current = false;
+    setPlaylistIndex(newIndex);
+    localStorage.setItem("melodyroads_index", newIndex);
+    setIsPlaying(false);
+
+    player.cuePlaylist({
+      list: PLAYLIST_ID,
+      listType: "playlist",
+      index: newIndex,
+    });
   }
 
   function nextSong() {
-    if (playerReady) {
-      playerRef.current?.nextVideo();
-    }
+    if (!playerReady || !playerRef.current) return;
+    const player = playerRef.current;
+    
+    let newIndex = playlistIndex + 1;
+
+    allowPlayRef.current = false;
+    setPlaylistIndex(newIndex);
+    localStorage.setItem("melodyroads_index", newIndex);
+    setIsPlaying(false);
+
+    player.cuePlaylist({
+      list: PLAYLIST_ID,
+      listType: "playlist",
+      index: newIndex,
+    });
   }
 
   function seekSong(event) {
@@ -258,45 +292,24 @@ export default function App() {
           href={`https://www.youtube.com/playlist?list=${PLAYLIST_ID}`}
           target="_blank"
           rel="noreferrer"
-          style={{
-            cursor: "pointer",
-            pointerEvents: "auto",
-            zIndex: 1000,
-            position: "relative",
-            color: "#e6cbab",
-            textDecoration: "none",
-            fontWeight: "600"
-          }}
+          className="youtube-link"
         >
           YouTube
         </a>
       </header>
 
-      {/* START ENGINE BUTTON (PLACED LOWER DOWN FROM ON ROAD) */}
-      <div style={{ display: "flex", justifyContent: "center", marginTop: "30px", zIndex: 10 }}>
+      {/* START ENGINE BUTTON */}
+      <div className="engine-container">
         <button
           onClick={handleStartEngine}
           disabled={!playerReady}
-          style={{
-            background: "rgba(50, 35, 24, 0.9)",
-            border: "1px solid rgba(212, 175, 55, 0.5)",
-            color: "#e6cbab",
-            padding: "8px 28px",
-            borderRadius: "30px",
-            fontSize: "13px",
-            fontWeight: "600",
-            letterSpacing: "1px",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-          }}
+          className="engine-btn"
         >
           <span>⏻</span> START ENGINE
         </button>
       </div>
 
-      {/* BRAND BLOCK (Top Right) */}
+      {/* BRAND BLOCK */}
       <section className="brand-block">
         <h1>MelodyRoads</h1>
         <p className="brand-hindi">रास्ते भी गुनगुनाते हैं</p>
@@ -307,48 +320,26 @@ export default function App() {
         </p>
       </section>
 
-      {/* MUSIC DOCK (BOTTOM CENTER) */}
-      <section 
-        className="music-dock" 
-        aria-label="MelodyRoads music player"
-        style={{
-          position: "fixed",
-          bottom: "30px",
-          left: "50%",
-          transform: "translateX(-50%)",
-          zIndex: 9999,
-          background: "transparent",
-          border: "none",
-          boxShadow: "none",
-          backdropFilter: "none",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "12px 30px",
-          width: "100%",
-          maxWidth: "1050px",
-          boxSizing: "border-box",
-          gap: "25px"
-        }}
-      >
-        <div className="song-info" style={{ display: "flex", alignItems: "center", gap: "15px", minWidth: "260px" }}>
-          <div className="song-art" style={{ width: "60px", height: "60px", borderRadius: "50%", overflow: "hidden", background: "rgba(255, 255, 255, 0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "24px" }}>
+      {/* MUSIC DOCK */}
+      <section className="music-dock" aria-label="MelodyRoads music player">
+        <div className="song-info">
+          <div className="song-art">
             {song.thumbnail ? (
-              <img src={song.thumbnail} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              <img src={song.thumbnail} alt="" />
             ) : (
               <span>♫</span>
             )}
           </div>
 
-          <div className="song-details" style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-            <small style={{ fontSize: "11px", letterSpacing: "1px", opacity: "0.8" }}>{isPlaying ? "NOW PLAYING" : "MELODYROADS RADIO"}</small>
-            <strong style={{ fontSize: "16px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "220px" }}>{song.title}</strong>
-            <span style={{ fontSize: "12px", opacity: "0.9" }}>{song.channel}</span>
+          <div className="song-details">
+            <small>{isPlaying ? "NOW PLAYING" : "MELODYROADS RADIO"}</small>
+            <strong>{song.title}</strong>
+            <span>{song.channel}</span>
           </div>
         </div>
 
-        <div className="player-controls" style={{ flex: 1, display: "flex", flexDirection: "column", gap: "8px", maxWidth: "500px" }}>
-          <div className="progress-row" style={{ display: "flex", alignItems: "center", gap: "12px", fontSize: "12px", opacity: "0.9" }}>
+        <div className="player-controls">
+          <div className="progress-row">
             <span>{formatTime(currentTime)}</span>
             <input
               className="progress-slider"
@@ -358,23 +349,23 @@ export default function App() {
               value={Math.min(currentTime, duration || 0)}
               onChange={seekSong}
               disabled={!playerReady || !duration}
-              style={{ "--progress": progress, flex: 1, height: "5px", cursor: "pointer" }}
+              style={{ "--progress": progress }}
               aria-label="Song progress"
             />
             <span>{formatTime(duration)}</span>
           </div>
 
-          <div className="control-buttons" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "20px" }}>
-            <button onClick={previousSong} disabled={!playerReady} aria-label="Previous song" style={{ background: "none", border: "none", color: "#e6cbab", fontSize: "16px", cursor: "pointer" }}>|◀</button>
-            <button className="play-button" onClick={togglePlayback} disabled={!playerReady} aria-label={isPlaying ? "Pause" : "Play"} style={{ width: "42px", height: "42px", background: "#e6cbab", color: "#1a140f", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "16px", fontWeight: "bold", cursor: "pointer", border: "none" }}>
+          <div className="control-buttons">
+            <button onClick={previousSong} disabled={!playerReady} aria-label="Previous song">|◀</button>
+            <button className="play-button" onClick={togglePlayback} disabled={!playerReady} aria-label={isPlaying ? "Pause" : "Play"}>
               {isPlaying ? "Ⅱ" : "▶"}
             </button>
-            <button onClick={nextSong} disabled={!playerReady} aria-label="Next song" style={{ background: "none", border: "none", color: "#e6cbab", fontSize: "16px", cursor: "pointer" }}>▶|</button>
+            <button onClick={nextSong} disabled={!playerReady} aria-label="Next song">▶|</button>
           </div>
 
-          <div className="volume-row" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", marginTop: "4px" }}>
-            <span style={{ display: "flex", alignItems: "center" }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e6cbab" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <div className="volume-row">
+            <span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e6cbab" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
                 <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
                 <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
@@ -388,8 +379,6 @@ export default function App() {
               onChange={(event) => setVolume(Number(event.target.value))}
               aria-label="Volume"
               style={{
-                cursor: "pointer",
-                height: "4px",
                 background: `linear-gradient(to right, #e6cbab ${volume}%, rgba(255, 255, 255, 0.2) ${volume}%)`
               }}
             />
@@ -399,9 +388,9 @@ export default function App() {
         <div style={{ position: "absolute", width: "1px", height: "1px", opacity: 0, pointerEvents: "none", overflow: "hidden" }} ref={playerHostRef} />
         {error && <p className="player-message">{error}</p>}
 
-        <div className="dock-footer" style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", fontSize: "10px", letterSpacing: "1px", opacity: "0.7", gap: "3px" }}>
+        <div className="dock-footer">
           <span>✦ OLD SONGS · NEW JOURNEYS ✦</span>
-          <span>PLAYLIST TRACK {playlistIndex + 1}</span>
+          <span>TRACK {playlistIndex + 1}</span>
         </div>
       </section>
 
