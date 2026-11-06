@@ -333,6 +333,11 @@ html, body {
     overflow: hidden;
   }
 
+  .road-topbar {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
   .engine-container {
     margin-top: 5px;
   }
@@ -369,7 +374,7 @@ html, body {
     bottom: unset !important;
     left: unset !important;
     transform: none !important;
-    background: rgba(18, 12, 8, 0.9) !important;
+    background: rgba(18, 12, 8, 0.95) !important;
     backdrop-filter: blur(10px) !important;
     -webkit-backdrop-filter: blur(10px) !important;
     border: 1px solid rgba(230, 203, 171, 0.2) !important;
@@ -427,7 +432,7 @@ html, body {
   }
 
   .volume-row {
-    display: none;
+    display: none !important;
   }
 
   .dock-footer {

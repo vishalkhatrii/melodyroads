@@ -3,9 +3,16 @@ import "./App.css";
 
 const PLAYLIST_ID = "PLLJOKBQMpmd8";
 
+// Firebase Realtime Database URL for Live Presence
+const PRESENCE_DB_URL = "https://melodyroads-906d4-default-rtdb.asia-southeast1.firebasedatabase.app";
+
 function formatTime(value) {
   const seconds = Math.max(0, Math.floor(value || 0));
   return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
+}
+
+function makeId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
 }
 
 function loadYouTubeAPI() {
@@ -38,6 +45,23 @@ function loadYouTubeAPI() {
   return window.youtubeApiPromise;
 }
 
+function readSavedIndex() {
+  try {
+    const saved = Number(localStorage.getItem("melodyroads_index"));
+    return Number.isInteger(saved) && saved >= 0 ? saved : 0;
+  } catch {
+    return 0;
+  }
+}
+
+function saveIndex(index) {
+  try {
+    localStorage.setItem("melodyroads_index", String(index));
+  } catch {
+    /* ignore */
+  }
+}
+
 export default function App() {
   const playerRef = useRef(null);
   const playerHostRef = useRef(null);
@@ -49,25 +73,8 @@ export default function App() {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(75);
-  
-  // Fresh v2 Visitor Counter (Starts at 1, doesn't increase on refresh)
-  const [visitorCount] = useState(() => {
-    const hasVisited = sessionStorage.getItem("melodyroads_visited_v2");
-    let total = Number(localStorage.getItem("melodyroads_v2_count") || 0);
-    
-    if (!hasVisited) {
-      total += 1;
-      localStorage.setItem("melodyroads_v2_count", total);
-      sessionStorage.setItem("melodyroads_visited_v2", "true");
-    }
-    return total;
-  });
-  
-  const [playlistIndex, setPlaylistIndex] = useState(() => {
-    const saved = localStorage.getItem("melodyroads_index");
-    return saved !== null ? Number(saved) : 0;
-  });
-
+  const [liveCount, setLiveCount] = useState(1);
+  const [playlistIndex, setPlaylistIndex] = useState(readSavedIndex);
   const [error, setError] = useState("");
 
   const [song, setSong] = useState({
@@ -76,13 +83,91 @@ export default function App() {
     thumbnail: "",
   });
 
+  // Clock
   useEffect(() => {
     const timer = window.setInterval(() => setClock(new Date()), 30000);
     return () => window.clearInterval(timer);
   }, []);
 
+  // Live users count (heartbeat based)
+  useEffect(() => {
+    if (!PRESENCE_DB_URL) {
+      console.warn("PRESENCE_DB_URL khaali hai, live count kaam nahi karega.");
+      return;
+    }
+
+    const base = PRESENCE_DB_URL.trim().replace(/\/+$/, "");
+    const id = makeId();
+    const myUrl = `${base}/presence/${id}.json`;
+    let stopped = false;
+
+    async function beat() {
+      try {
+        const put = await fetch(myUrl, {
+          method: "PUT",
+          body: JSON.stringify({ ".sv": "timestamp" }),
+        });
+        if (!put.ok) {
+          console.warn("Presence write fail:", put.status, await put.text());
+          return;
+        }
+
+        const res = await fetch(`${base}/presence.json`);
+        if (!res.ok) {
+          console.warn("Presence read fail:", res.status);
+          return;
+        }
+        const data = await res.json();
+        if (stopped || !data) return;
+
+        const entries = Object.entries(data).filter(
+          ([, t]) => typeof t === "number"
+        );
+        if (!entries.length) return;
+
+        const newest = Math.max(...entries.map(([, t]) => t));
+        const alive = entries.filter(([, t]) => newest - t < 60000);
+        setLiveCount(Math.max(1, alive.length));
+
+        entries
+          .filter(([, t]) => newest - t > 300000)
+          .slice(0, 10)
+          .forEach(([key]) => {
+            fetch(`${base}/presence/${key}.json`, { method: "DELETE" }).catch(
+              () => {}
+            );
+          });
+      } catch (err) {
+        console.warn("Presence error:", err);
+      }
+    }
+
+    function leave() {
+      fetch(myUrl, { method: "DELETE", keepalive: true }).catch(() => {});
+    }
+
+    function onVisible() {
+      if (document.visibilityState === "visible") beat();
+    }
+
+    beat();
+    const timer = window.setInterval(beat, 15000);
+    window.addEventListener("pagehide", leave);
+    document.addEventListener("visibilitychange", onVisible);
+
+    return () => {
+      stopped = true;
+      window.clearInterval(timer);
+      window.removeEventListener("pagehide", leave);
+      document.removeEventListener("visibilitychange", onVisible);
+      leave();
+    };
+  }, []);
+
+  // YouTube player
   useEffect(() => {
     let cancelled = false;
+    let endTimer = null;
 
     async function initializePlayer() {
       try {
@@ -97,7 +182,7 @@ export default function App() {
         mount.id = "melodyroads-youtube-player";
         playerHostRef.current.appendChild(mount);
 
-        const initialIndex = Number(localStorage.getItem("melodyroads_index") || 0);
+        const initialIndex = readSavedIndex();
 
         playerRef.current = new YT.Player(mount, {
           width: "200",
@@ -115,9 +200,9 @@ export default function App() {
               if (cancelled) return;
 
               setPlayerReady(true);
-              event.target.setVolume(volume);
+              event.target.setVolume(75);
               allowPlayRef.current = false;
-              
+
               event.target.cuePlaylist({
                 list: PLAYLIST_ID,
                 listType: "playlist",
@@ -145,7 +230,7 @@ export default function App() {
                 state === YT.PlayerState.CUED
               ) {
                 const video = player.getVideoData?.() || {};
-                const currentIndex = player.getPlaylistIndex?.() ?? 0;
+                const currentIndex = player.getPlaylistIndex?.();
 
                 setSong({
                   title: video.title || "YouTube playlist song",
@@ -155,15 +240,32 @@ export default function App() {
                     : "",
                 });
 
-                if (!isNaN(currentIndex)) {
+                if (typeof currentIndex === "number" && currentIndex >= 0) {
                   setPlaylistIndex(currentIndex);
-                  localStorage.setItem("melodyroads_index", currentIndex);
+                  saveIndex(currentIndex);
                 }
                 setDuration(player.getDuration?.() || 0);
               }
 
               if (state === YT.PlayerState.ENDED) {
                 setCurrentTime(0);
+                window.clearTimeout(endTimer);
+
+                endTimer = window.setTimeout(() => {
+                  if (cancelled) return;
+                  if (player.getPlayerState?.() !== YT.PlayerState.ENDED) return;
+
+                  const list = player.getPlaylist?.() || [];
+                  const idx = player.getPlaylistIndex?.() ?? 0;
+
+                  allowPlayRef.current = true;
+
+                  if (list.length && idx >= list.length - 1) {
+                    player.playVideoAt(0);
+                  } else {
+                    player.nextVideo();
+                  }
+                }, 600);
               }
             },
 
@@ -185,11 +287,13 @@ export default function App() {
 
     return () => {
       cancelled = true;
+      window.clearTimeout(endTimer);
       playerRef.current?.destroy();
       playerRef.current = null;
     };
   }, []);
 
+  // Progress updates
   useEffect(() => {
     if (!isPlaying) return;
 
@@ -200,9 +304,9 @@ export default function App() {
         setCurrentTime(player.getCurrentTime() || 0);
         setDuration(player.getDuration() || 0);
         const idx = player.getPlaylistIndex?.();
-        if (idx !== undefined && !isNaN(idx)) {
+        if (typeof idx === "number" && idx >= 0) {
           setPlaylistIndex(idx);
-          localStorage.setItem("melodyroads_index", idx);
+          saveIndex(idx);
         }
       }
     }, 1000);
@@ -210,6 +314,7 @@ export default function App() {
     return () => window.clearInterval(timer);
   }, [isPlaying]);
 
+  // Volume
   useEffect(() => {
     if (playerReady && playerRef.current?.setVolume) {
       playerRef.current.setVolume(volume);
@@ -239,17 +344,15 @@ export default function App() {
     }
   }
 
-  function previousSong() {
-    if (!playerReady || !playerRef.current) return;
+  function cueIndex(newIndex) {
     const player = playerRef.current;
-    
-    let newIndex = playlistIndex - 1;
-    if (newIndex < 0) newIndex = 0;
+    if (!player) return;
 
     allowPlayRef.current = false;
-    setPlaylistIndex(newIndex);
-    localStorage.setItem("melodyroads_index", newIndex);
     setIsPlaying(false);
+    setCurrentTime(0);
+    setPlaylistIndex(newIndex);
+    saveIndex(newIndex);
 
     player.cuePlaylist({
       list: PLAYLIST_ID,
@@ -258,22 +361,30 @@ export default function App() {
     });
   }
 
-  function nextSong() {
-    if (!playerReady || !playerRef.current) return;
+  function previousSong() {
     const player = playerRef.current;
-    
-    let newIndex = playlistIndex + 1;
+    if (!playerReady || !player) return;
 
-    allowPlayRef.current = false;
-    setPlaylistIndex(newIndex);
-    localStorage.setItem("melodyroads_index", newIndex);
-    setIsPlaying(false);
+    const list = player.getPlaylist?.() || [];
+    const current = player.getPlaylistIndex?.() ?? playlistIndex;
 
-    player.cuePlaylist({
-      list: PLAYLIST_ID,
-      listType: "playlist",
-      index: newIndex,
-    });
+    let newIndex = current - 1;
+    if (newIndex < 0) newIndex = list.length ? list.length - 1 : 0;
+
+    cueIndex(newIndex);
+  }
+
+  function nextSong() {
+    const player = playerRef.current;
+    if (!playerReady || !player) return;
+
+    const list = player.getPlaylist?.() || [];
+    const current = player.getPlaylistIndex?.() ?? playlistIndex;
+
+    let newIndex = current + 1;
+    if (list.length && newIndex >= list.length) newIndex = 0;
+
+    cueIndex(newIndex);
   }
 
   function seekSong(event) {
@@ -282,8 +393,7 @@ export default function App() {
     playerRef.current?.seekTo(value, true);
   }
 
-  const progress =
-    duration > 0 ? `${(currentTime / duration) * 100}%` : "0%";
+  const progress = duration > 0 ? `${(currentTime / duration) * 100}%` : "0%";
 
   return (
     <main className="road-page">
@@ -298,7 +408,7 @@ export default function App() {
         </span>
 
         <span className="road-status">
-          <i /> {visitorCount} ON ROAD
+          <i /> {liveCount ?? 1} ON ROAD
         </span>
 
         <a
@@ -369,16 +479,42 @@ export default function App() {
           </div>
 
           <div className="control-buttons">
-            <button onClick={previousSong} disabled={!playerReady} aria-label="Previous song">|◀</button>
-            <button className="play-button" onClick={togglePlayback} disabled={!playerReady} aria-label={isPlaying ? "Pause" : "Play"}>
+            <button
+              onClick={previousSong}
+              disabled={!playerReady}
+              aria-label="Previous song"
+            >
+              |◀
+            </button>
+            <button
+              className="play-button"
+              onClick={togglePlayback}
+              disabled={!playerReady}
+              aria-label={isPlaying ? "Pause" : "Play"}
+            >
               {isPlaying ? "Ⅱ" : "▶"}
             </button>
-            <button onClick={nextSong} disabled={!playerReady} aria-label="Next song">▶|</button>
+            <button
+              onClick={nextSong}
+              disabled={!playerReady}
+              aria-label="Next song"
+            >
+              ▶|
+            </button>
           </div>
 
           <div className="volume-row">
             <span>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e6cbab" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#e6cbab"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
                 <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
                 <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
@@ -392,13 +528,23 @@ export default function App() {
               onChange={(event) => setVolume(Number(event.target.value))}
               aria-label="Volume"
               style={{
-                background: `linear-gradient(to right, #e6cbab ${volume}%, rgba(255, 255, 255, 0.2) ${volume}%)`
+                background: `linear-gradient(to right, #e6cbab ${volume}%, rgba(255, 255, 255, 0.2) ${volume}%)`,
               }}
             />
           </div>
         </div>
 
-        <div style={{ position: "absolute", width: "1px", height: "1px", opacity: 0, pointerEvents: "none", overflow: "hidden" }} ref={playerHostRef} />
+        <div
+          style={{
+            position: "absolute",
+            width: "1px",
+            height: "1px",
+            opacity: 0,
+            pointerEvents: "none",
+            overflow: "hidden",
+          }}
+          ref={playerHostRef}
+        />
         {error && <p className="player-message">{error}</p>}
 
         <div className="dock-footer">
