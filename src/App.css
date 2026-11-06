@@ -5,23 +5,30 @@ html, body {
   padding: 0;
   width: 100%;
   min-height: 100vh;
+  min-height: 100dvh;
   box-sizing: border-box;
   overflow-x: hidden;
   background-color: #120d09;
+  -webkit-text-size-adjust: 100%;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
 }
 
 .road-page {
   position: relative;
   min-height: 100vh;
-  width: 100vw;
-  box-sizing: border-box;
-  padding: 20px 40px;
+  min-height: 100dvh;
+  width: 100%;
+  padding: 20px clamp(16px, 3vw, 40px);
   font-family: sans-serif;
   color: #e6cbab;
   background-image: url('/images/indian-truck.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  overflow-x: hidden;
 }
 
 .background-shade {
@@ -45,9 +52,16 @@ html, body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 10px;
   font-size: 14px;
   font-weight: 500;
   letter-spacing: 1px;
+}
+
+.road-clock,
+.road-status,
+.youtube-link {
+  white-space: nowrap;
 }
 
 .road-status {
@@ -92,21 +106,28 @@ html, body {
   display: flex;
   align-items: center;
   gap: 8px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.engine-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
 }
 
 /* ==========================================
-   DESKTOP VERSION (Default Layout)
+   DESKTOP / LAPTOP (default)
    ========================================== */
 .brand-block {
   position: absolute;
   top: 105px;
-  right: 50px;
+  right: clamp(20px, 4vw, 50px);
+  max-width: 90%;
   text-align: right;
 }
 
 .brand-block h1 {
   font-family: 'Great Vibes', cursive;
-  font-size: 7.5rem;
+  font-size: clamp(4rem, 9vw, 7.5rem);
   font-weight: 400;
   margin: 0;
   letter-spacing: 2px;
@@ -114,16 +135,17 @@ html, body {
 }
 
 .brand-hindi {
-  font-size: 1.5rem;
+  font-size: clamp(1.1rem, 2vw, 1.5rem);
   margin: 14px 0 10px 0;
   font-weight: 700;
 }
 
 .brand-caption {
-  font-size: 1.1rem;
+  font-size: clamp(0.9rem, 1.5vw, 1.1rem);
   font-weight: 600;
   opacity: 0.95;
   line-height: 1.4;
+  margin: 0;
 }
 
 .music-dock {
@@ -139,9 +161,8 @@ html, body {
   align-items: center;
   justify-content: space-between;
   padding: 12px 30px;
-  width: 100%;
+  width: calc(100% - 32px);
   max-width: 1050px;
-  box-sizing: border-box;
   gap: 25px;
   z-index: 9999;
 }
@@ -176,6 +197,7 @@ html, body {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  min-width: 0;
 }
 
 .song-details small {
@@ -199,6 +221,7 @@ html, body {
 
 .player-controls {
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -213,20 +236,39 @@ html, body {
   opacity: 0.9;
 }
 
+.progress-row span {
+  flex-shrink: 0;
+  min-width: 32px;
+  text-align: center;
+}
+
 .progress-slider {
   flex: 1;
+  min-width: 0;
   appearance: none;
+  -webkit-appearance: none;
   height: 5px;
   border-radius: 2px;
   background: rgba(230, 203, 171, 0.2);
   outline: none;
   cursor: pointer;
+  touch-action: none;
 }
 
 .progress-slider::-webkit-slider-thumb {
   appearance: none;
+  -webkit-appearance: none;
   width: 11px;
   height: 11px;
+  border-radius: 50%;
+  background: #e6cbab;
+  cursor: pointer;
+}
+
+.progress-slider::-moz-range-thumb {
+  width: 11px;
+  height: 11px;
+  border: none;
   border-radius: 50%;
   background: #e6cbab;
   cursor: pointer;
@@ -246,11 +288,16 @@ html, body {
   font-size: 16px;
   cursor: pointer;
   opacity: 0.8;
+  min-width: 36px;
+  min-height: 36px;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .control-buttons .play-button {
   width: 42px;
   height: 42px;
+  min-width: 42px;
+  min-height: 42px;
   background: #e6cbab;
   color: #1a140f;
   border-radius: 50%;
@@ -261,6 +308,7 @@ html, body {
   font-weight: bold;
   cursor: pointer;
   border: none;
+  opacity: 1;
 }
 
 .volume-row {
@@ -273,6 +321,7 @@ html, body {
 
 .volume-row input[type="range"] {
   appearance: none;
+  -webkit-appearance: none;
   height: 4px;
   border-radius: 2px;
   outline: none;
@@ -282,8 +331,18 @@ html, body {
 
 .volume-row input[type="range"]::-webkit-slider-thumb {
   appearance: none;
+  -webkit-appearance: none;
   width: 10px;
   height: 10px;
+  border-radius: 50%;
+  background: #e6cbab;
+  cursor: pointer;
+}
+
+.volume-row input[type="range"]::-moz-range-thumb {
+  width: 10px;
+  height: 10px;
+  border: none;
   border-radius: 50%;
   background: #e6cbab;
   cursor: pointer;
@@ -297,6 +356,7 @@ html, body {
   letter-spacing: 1px;
   opacity: 0.7;
   gap: 3px;
+  white-space: nowrap;
 }
 
 .road-footer {
@@ -320,30 +380,54 @@ html, body {
 }
 
 /* ==========================================
-   MOBILE VERSION (Phone Layout - max-width: 900px)
+   TABLET / SMALL LAPTOP (901px - 1100px)
+   ========================================== */
+@media screen and (min-width: 901px) and (max-width: 1100px) {
+  .music-dock {
+    gap: 16px;
+    padding: 12px 16px;
+  }
+
+  .song-info {
+    min-width: 220px;
+  }
+
+  .song-details strong {
+    max-width: 170px;
+  }
+}
+
+/* ==========================================
+   PHONE / TABLET PORTRAIT (max-width: 900px)
    ========================================== */
 @media screen and (max-width: 900px) {
   .road-page {
-    padding: 10px 15px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     min-height: 100vh;
-    height: 100vh;
-    overflow: hidden;
+    min-height: 100dvh;
+    height: auto;
+    overflow-y: auto;
+    background-position: 30% center;
+    padding-top: max(12px, env(safe-area-inset-top));
+    padding-bottom: max(10px, env(safe-area-inset-bottom));
+    padding-left: max(14px, env(safe-area-inset-left));
+    padding-right: max(14px, env(safe-area-inset-right));
   }
 
   .road-topbar {
     width: 100%;
-    box-sizing: border-box;
+    font-size: 12px;
+    letter-spacing: 0.5px;
   }
 
   .engine-container {
-    margin-top: 5px;
+    margin-top: 10px;
   }
 
   .engine-btn {
-    padding: 6px 18px;
+    padding: 8px 20px;
     font-size: 11px;
   }
 
@@ -351,22 +435,25 @@ html, body {
     position: relative;
     top: unset;
     right: unset;
+    max-width: 100%;
     text-align: center;
-    margin: 5px 0;
+    margin: 10px 0;
   }
 
   .brand-block h1 {
-    font-size: 3.2rem;
+    font-size: clamp(2.6rem, 15vw, 4.5rem);
+    letter-spacing: 1px;
+    line-height: 1;
   }
 
   .brand-hindi {
-    font-size: 0.95rem;
-    margin: 3px 0;
+    font-size: clamp(0.9rem, 4vw, 1.2rem);
+    margin: 6px 0;
   }
 
   .brand-caption {
-    font-size: 0.75rem;
-    line-height: 1.1;
+    font-size: clamp(0.72rem, 3.2vw, 0.95rem);
+    line-height: 1.3;
   }
 
   .music-dock {
@@ -379,12 +466,11 @@ html, body {
     -webkit-backdrop-filter: blur(10px) !important;
     border: 1px solid rgba(230, 203, 171, 0.2) !important;
     border-radius: 14px;
-    display: flex;
     flex-direction: column;
+    align-items: stretch;
     padding: 10px 12px;
     width: 100%;
     max-width: 100%;
-    box-sizing: border-box;
     gap: 8px;
     margin-bottom: 5px;
   }
@@ -392,22 +478,26 @@ html, body {
   .song-info {
     width: 100%;
     justify-content: flex-start;
-    min-width: unset;
+    min-width: 0;
     gap: 10px;
   }
 
   .song-art {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
+  }
+
+  .song-details {
+    flex: 1;
   }
 
   .song-details strong {
-    font-size: 12px;
-    max-width: 230px;
+    font-size: 13px;
+    max-width: 100%;
   }
 
   .song-details span {
-    font-size: 9px;
+    font-size: 10px;
   }
 
   .player-controls {
@@ -417,29 +507,98 @@ html, body {
   }
 
   .progress-row {
-    font-size: 9px;
+    font-size: 10px;
     gap: 8px;
   }
 
+  .progress-slider {
+    height: 6px;
+  }
+
+  .progress-slider::-webkit-slider-thumb {
+    width: 14px;
+    height: 14px;
+  }
+
+  .progress-slider::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+  }
+
   .control-buttons {
-    gap: 20px;
+    gap: 28px;
+  }
+
+  .control-buttons button {
+    min-width: 44px;
+    min-height: 44px;
   }
 
   .control-buttons .play-button {
-    width: 32px;
-    height: 32px;
-    font-size: 12px;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    font-size: 14px;
   }
 
-  .volume-row {
+  .volume-row,
+  .dock-footer,
+  .road-footer {
     display: none !important;
   }
+}
 
-  .dock-footer {
+/* ==========================================
+   VERY SMALL PHONES (max-width: 360px)
+   ========================================== */
+@media screen and (max-width: 360px) {
+  .road-topbar {
+    font-size: 11px;
+  }
+
+  .song-art {
+    width: 38px;
+    height: 38px;
+  }
+
+  .control-buttons {
+    gap: 18px;
+  }
+}
+
+/* ==========================================
+   LANDSCAPE PHONES (low height)
+   ========================================== */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+  .engine-container {
+    margin-top: 4px;
+  }
+
+  .brand-block {
+    margin: 4px 0;
+  }
+
+  .brand-block h1 {
+    font-size: 2.4rem;
+  }
+
+  .brand-caption {
     display: none;
   }
 
-  .road-footer {
-    display: none;
+  .music-dock {
+    flex-direction: row !important;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .song-info {
+    width: auto;
+    flex: 1;
+  }
+
+  .player-controls {
+    flex: 1.5;
   }
 }
