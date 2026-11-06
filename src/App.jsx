@@ -41,11 +41,7 @@ function loadYouTubeAPI() {
 export default function App() {
   const playerRef = useRef(null);
   const playerHostRef = useRef(null);
-<<<<<<< HEAD
   const allowPlayRef = useRef(false);
-=======
-  const allowPlayRef = useRef(false); // Yeh track karega ki user ne khud play dabaya ya nahi
->>>>>>> c1d6c6a322f633686397c1d4227ff761fb4a8cc0
 
   const [clock, setClock] = useState(new Date());
   const [playerReady, setPlayerReady] = useState(false);
@@ -53,6 +49,19 @@ export default function App() {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(75);
+  
+  // Fresh v2 Visitor Counter (Starts at 1, doesn't increase on refresh)
+  const [visitorCount] = useState(() => {
+    const hasVisited = sessionStorage.getItem("melodyroads_visited_v2");
+    let total = Number(localStorage.getItem("melodyroads_v2_count") || 0);
+    
+    if (!hasVisited) {
+      total += 1;
+      localStorage.setItem("melodyroads_v2_count", total);
+      sessionStorage.setItem("melodyroads_visited_v2", "true");
+    }
+    return total;
+  });
   
   const [playlistIndex, setPlaylistIndex] = useState(() => {
     const saved = localStorage.getItem("melodyroads_index");
@@ -122,10 +131,6 @@ export default function App() {
               const player = event.target;
               const state = event.data;
 
-<<<<<<< HEAD
-=======
-              // Agar user ne khud play nahi dabaya aur state PLAYING ho gayi, toh turant pause kar do!
->>>>>>> c1d6c6a322f633686397c1d4227ff761fb4a8cc0
               if (state === YT.PlayerState.PLAYING && !allowPlayRef.current) {
                 player.pauseVideo();
                 setIsPlaying(false);
@@ -227,11 +232,7 @@ export default function App() {
       allowPlayRef.current = false;
       player.pauseVideo();
     } else {
-<<<<<<< HEAD
       allowPlayRef.current = true;
-=======
-      allowPlayRef.current = true; // User ne explicit play kiya
->>>>>>> c1d6c6a322f633686397c1d4227ff761fb4a8cc0
       player.playVideo();
       player.unMute?.();
       player.setVolume(volume);
@@ -245,11 +246,7 @@ export default function App() {
     let newIndex = playlistIndex - 1;
     if (newIndex < 0) newIndex = 0;
 
-<<<<<<< HEAD
     allowPlayRef.current = false;
-=======
-    allowPlayRef.current = false; // Auto-play block flag ON
->>>>>>> c1d6c6a322f633686397c1d4227ff761fb4a8cc0
     setPlaylistIndex(newIndex);
     localStorage.setItem("melodyroads_index", newIndex);
     setIsPlaying(false);
@@ -267,11 +264,7 @@ export default function App() {
     
     let newIndex = playlistIndex + 1;
 
-<<<<<<< HEAD
     allowPlayRef.current = false;
-=======
-    allowPlayRef.current = false; // Auto-play block flag ON
->>>>>>> c1d6c6a322f633686397c1d4227ff761fb4a8cc0
     setPlaylistIndex(newIndex);
     localStorage.setItem("melodyroads_index", newIndex);
     setIsPlaying(false);
@@ -305,7 +298,7 @@ export default function App() {
         </span>
 
         <span className="road-status">
-          <i /> ON ROAD
+          <i /> {visitorCount} ON ROAD
         </span>
 
         <a
@@ -319,11 +312,7 @@ export default function App() {
       </header>
 
       {/* START ENGINE BUTTON */}
-<<<<<<< HEAD
       <div className="engine-container">
-=======
-      <div style={{ display: "flex", justifyContent: "center", marginTop: "30px", zIndex: 10 }}>
->>>>>>> c1d6c6a322f633686397c1d4227ff761fb4a8cc0
         <button
           onClick={handleStartEngine}
           disabled={!playerReady}
